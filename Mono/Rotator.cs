@@ -3,7 +3,7 @@ using System.Collections;
 
 namespace PofyTools
 {
-	[ExecuteInEditMode]
+	//[ExecuteInEditMode]
 	public class Rotator : MonoBehaviour
 	{
 		public Vector3 axis;
