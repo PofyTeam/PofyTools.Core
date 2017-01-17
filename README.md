@@ -1,2 +1,2 @@
 # PofyTools.Core (BETA)
-Core Component of PofyTools required by most other components.
+Core Component of PofyTools for Unity, required by most other components.
