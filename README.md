@@ -2,7 +2,7 @@
 Core Component of PofyTools for Unity, required by most other components.
 
 
-## Version 0.0.2
+## Version 0.0.2 Changes
 - Removed ColorPair script
 - Removed Levelable script
 - Removed Arc script
