@@ -5,299 +5,321 @@ using System.Collections.Generic;
 namespace PofyTools
 {
 
-	public abstract class StateableActor : MonoBehaviour, IStateable//, ITransformable, ISubscribable
-	{
-		#region Variables
+    public abstract class StateableActor : MonoBehaviour, IStateable//, ITransformable, ISubscribable
+    {
+        #region Variables
 
-		public bool selfSubscribe = true;
-		public bool removeAllStatesOnStart = true;
+        public bool selfSubscribe = true;
+        public bool removeAllStatesOnStart = true;
 
-		protected List<IState> _stateStack;
+        protected List<IState> _stateStack;
 
-		#endregion
+        #endregion
 
-		#region ISubscribable implementation
+        #region ISubscribable implementation
 
-		protected bool _isSubscribed = false;
+        protected bool _isSubscribed = false;
 
-		public virtual void Subscribe ()
-		{
-			Unsubscribe ();
-			this._isSubscribed = true;
-		}
+        public virtual void Subscribe()
+        {
+            Unsubscribe();
+            this._isSubscribed = true;
+        }
 
-		public virtual void Unsubscribe ()
-		{
-			this._isSubscribed = false;
-		}
+        public virtual void Unsubscribe()
+        {
+            this._isSubscribed = false;
+        }
 
-		public bool isSubscribed {
-			get {
-				return this._isSubscribed;
-			}
+        public bool isSubscribed
+        {
+            get
+            {
+                return this._isSubscribed;
+            }
 
-		}
+        }
 
-		protected virtual void OnDestroy ()
-		{
-			//base.OnDestroy ();
-			RemoveAllStates ();
-			if (this._isSubscribed)
-				Unsubscribe ();
-		}
+        protected virtual void OnDestroy()
+        {
+            //base.OnDestroy ();
+//			RemoveAllStates ();
+            PurgeStateStack();
+            if (this._isSubscribed)
+                Unsubscribe();
+        }
 
-		#endregion
+        #endregion
 
-		#region IStateable implementation
+        #region IStateable implementation
 
-		public void AddState (IState state)
-		{
-			state.EnterState ();
-			if (!this._stateStack.Contains (state)) {
+        public void AddState(IState state)
+        {
+            state.EnterState();
+            if (!this._stateStack.Contains(state))
+            {
 				
-				if (state.hasUpdate) {
-					this._stateStack.Add (state);
-					this.enabled = true;
-				} else
-					state.ExitState ();
-			}
-		}
+                if (state.hasUpdate)
+                {
+                    this._stateStack.Add(state);
+                    this.enabled = true;
+                }
+                else
+                    state.ExitState();
+            }
+        }
 
-		public void RemoveState (IState state)
-		{
-			if (this._stateStack.Remove (state)) {
-				state.ExitState ();
-			}
+        public void RemoveState(IState state)
+        {
+            if (this._stateStack.Remove(state))
+            {
+                state.ExitState();
+            }
 
-			if (this._stateStack.Count == 0)
-				this.enabled = false;
-		}
+            if (this._stateStack.Count == 0)
+                this.enabled = false;
+        }
 
-		public void RemoveAllStates (bool endStates = true)
-		{
+        public void RemoveAllStates(bool endStates = true)
+        {
 			
-			if (this._stateStack != null && endStates) {
-				int count = this._stateStack.Count;
-				IState state = null;
-				for (int i = count - 1; i >= 0; --i) {
-					state = this._stateStack [i];
-					this._stateStack.RemoveAt (i);
-					state.ExitState ();
-				}
-			}
-			PurgeStateStack ();
-		}
+            if (this._stateStack != null && endStates)
+            {
+                int count = this._stateStack.Count;
+                IState state = null;
+                for (int i = count - 1; i >= 0; --i)
+                {
+                    state = this._stateStack[i];
+                    this._stateStack.RemoveAt(i);
+                    state.ExitState();
+                }
+            }
+            PurgeStateStack();
+        }
 
-		public void PurgeStateStack ()
-		{
-			if (this._stateStack != null)
-				this._stateStack.Clear ();
+        public void PurgeStateStack()
+        {
+            if (this._stateStack != null)
+                this._stateStack.Clear();
 
-			this.enabled = false;
-		}
+            this.enabled = false;
+        }
 
-		public void StackState (IState state)
-		{
-			state.EnterState ();
-			if (state.hasUpdate) {
+        public void StackState(IState state)
+        {
+            state.EnterState();
+            if (state.hasUpdate)
+            {
 				
-				this._stateStack.Add (state);
-			} else {
-				AddState (state);
-			}
-		}
+                this._stateStack.Add(state);
+            }
+            else
+            {
+                AddState(state);
+            }
+        }
 
-		public void SetToState (IState state)
-		{
-			RemoveAllStates ();
-			AddState (state);
-		}
+        public void SetToState(IState state)
+        {
+            RemoveAllStates();
+            AddState(state);
+        }
 
-		#endregion
+        #endregion
 
-		#region ITransformable implementation
+        #region ITransformable implementation
 
-		protected Transform _selfTransform;
+        protected Transform _selfTransform;
 
-		public Transform selfTransform {
-			get {
-				return this._selfTransform;
-			}
-		}
+        public Transform selfTransform
+        {
+            get
+            {
+                return this._selfTransform;
+            }
+        }
 
-		#endregion
+        #endregion
 
-		#region Mono
+        #region Mono
 
-		protected virtual void Awake ()
-		{
-			this._selfTransform = this.transform;
-			ConstructAvailableStates ();
-			InitializeStateStack ();
-		}
+        protected virtual void Awake()
+        {
+            this._selfTransform = this.transform;
+            ConstructAvailableStates();
+            InitializeStateStack();
+        }
 			
-		// Use this for initialization
-		protected virtual void Start ()
-		{
-			if (this.selfSubscribe)
-				Subscribe ();
+        // Use this for initialization
+        protected virtual void Start()
+        {
+            if (this.selfSubscribe)
+                Subscribe();
 
-			if (this.removeAllStatesOnStart)
-				PurgeStateStack ();
-		}
+            if (this.removeAllStatesOnStart)
+                PurgeStateStack();
+        }
 	
-		// Update is called once per frame
-		protected void Update ()
-		{
-			IState state = null;
+        // Update is called once per frame
+        protected void Update()
+        {
+            IState state = null;
 
-			for (int i = this._stateStack.Count - 1; i >= 0; --i) {
-				state = this._stateStack [i];
+            for (int i = this._stateStack.Count - 1; i >= 0; --i)
+            {
+                state = this._stateStack[i];
 
-				if (state.UpdateState ()) {
-					this._stateStack.RemoveAt (i);
-					state.ExitState ();
-				}
-			}
-		}
+                if (state.UpdateState())
+                {
+                    this._stateStack.RemoveAt(i);
+                    state.ExitState();
+                }
+            }
+        }
 
-		protected void FixedUpdate ()
-		{
-			IState state = null;
+        protected void FixedUpdate()
+        {
+            IState state = null;
 
-			for (int i = this._stateStack.Count - 1; i >= 0; --i) {
-				state = this._stateStack [i];
+            for (int i = this._stateStack.Count - 1; i >= 0; --i)
+            {
+                state = this._stateStack[i];
 
-				if (state.FixedUpdateState ()) {
-					this._stateStack.RemoveAt (i);
-					state.ExitState ();
+                if (state.FixedUpdateState())
+                {
+                    this._stateStack.RemoveAt(i);
+                    state.ExitState();
 
-				}
-			}
-		}
+                }
+            }
+        }
 
-		protected void LateUpdate ()
-		{
-			IState state = null;
+        protected void LateUpdate()
+        {
+            IState state = null;
 
-			for (int i = this._stateStack.Count - 1; i >= 0; --i) {
-				state = this._stateStack [i];
+            for (int i = this._stateStack.Count - 1; i >= 0; --i)
+            {
+                state = this._stateStack[i];
 
-				if (state.LateUpdateState ()) {
-					this._stateStack.RemoveAt (i);
-					state.ExitState ();
-				}
-			}
-		}
+                if (state.LateUpdateState())
+                {
+                    this._stateStack.RemoveAt(i);
+                    state.ExitState();
+                }
+            }
+        }
 
-		#endregion
+        #endregion
 
-		#region States
+        #region States
 
-		public abstract void ConstructAvailableStates ();
+        public abstract void ConstructAvailableStates();
 
-		public abstract void InitializeStateStack ();
+        public abstract void InitializeStateStack();
 
-		#endregion
-	}
+        #endregion
+    }
 
-	public class StateObject<T>:IState where T:MonoBehaviour
-	{
-		protected T _controlledObject;
+    public class StateObject<T>:IState where T:MonoBehaviour
+    {
+        protected T _controlledObject;
 
-		protected bool _hasUpdate = true;
+        protected bool _hasUpdate = true;
 
-		public bool hasUpdate {
-			get{ return this._hasUpdate; }
-		}
+        public bool hasUpdate
+        {
+            get{ return this._hasUpdate; }
+        }
 
-		#region constructor
+        #region constructor
 
-		public StateObject ()
-		{
-		}
+        public StateObject()
+        {
+        }
 
-		public StateObject (T controlledObject)
-		{
-			this._controlledObject = controlledObject;
-			InitializeState ();
-		}
+        public StateObject(T controlledObject)
+        {
+            this._controlledObject = controlledObject;
+            InitializeState();
+        }
 
-		#endregion
+        #endregion
 
-		#region IState implementation
+        #region IState implementation
 
-		public virtual void InitializeState ()
-		{
-			if (this._controlledObject == null) {
-				Debug.LogError (this.ToString () + " has no controlled object");
-			}
-		}
+        public virtual void InitializeState()
+        {
+            if (this._controlledObject == null)
+            {
+                Debug.LogError(this.ToString() + " has no controlled object");
+            }
+        }
 
-		public virtual void EnterState ()
-		{
-			//do staff on enter
-		}
+        public virtual void EnterState()
+        {
+            //do staff on enter
+        }
 
-		public virtual bool UpdateState ()
-		{
-			//return true on exit condition
-			return false;
-		}
+        public virtual bool UpdateState()
+        {
+            //return true on exit condition
+            return false;
+        }
 
-		public virtual bool FixedUpdateState ()
-		{
-			//do fixed stuff
-			return false;
-		}
+        public virtual bool FixedUpdateState()
+        {
+            //do fixed stuff
+            return false;
+        }
 
-		public virtual bool LateUpdateState ()
-		{
-			//do late state
-			return false;
-		}
+        public virtual bool LateUpdateState()
+        {
+            //do late state
+            return false;
+        }
 
-		public virtual void ExitState ()
-		{
-			//do stuff on exit state
-		}
+        public virtual void ExitState()
+        {
+            //do stuff on exit state
+        }
 
-		#endregion
-	}
+        #endregion
+    }
 
-	public interface IState
-	{
-		void InitializeState ();
+    public interface IState
+    {
+        void InitializeState();
 
-		void EnterState ();
+        void EnterState();
 
-		bool UpdateState ();
+        bool UpdateState();
 
-		bool FixedUpdateState ();
+        bool FixedUpdateState();
 
-		bool LateUpdateState ();
+        bool LateUpdateState();
 
-		void ExitState ();
+        void ExitState();
 
-		bool hasUpdate{ get; }
-	}
+        bool hasUpdate{ get; }
+    }
 
-	public interface IStateable
-	{
-		void InitializeStateStack ();
+    public interface IStateable
+    {
+        void InitializeStateStack();
 
-		void ConstructAvailableStates ();
+        void ConstructAvailableStates();
 
-		void AddState (IState state);
+        void AddState(IState state);
 
-		void RemoveState (IState state);
+        void RemoveState(IState state);
 
-		void RemoveAllStates (bool endStates = true);
+        void RemoveAllStates(bool endStates = true);
 
-		void PurgeStateStack ();
+        void PurgeStateStack();
 
-		void StackState (IState state);
+        void StackState(IState state);
 
-	}
+    }
 
 }
