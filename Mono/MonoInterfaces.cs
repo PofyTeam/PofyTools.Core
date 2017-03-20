@@ -1,155 +1,177 @@
 ﻿namespace PofyTools
 {
-	using UnityEngine;
-	using System.Collections;
+    using UnityEngine;
+    using System.Collections;
 
 
-	public interface ICollidable
-	{
-		Rigidbody selfRigidbody {
-			get;
-		}
+    public interface ICollidable
+    {
+        Rigidbody selfRigidbody
+        {
+            get;
+        }
 
-		Collider selfCollider {
-			get;
-		}
-	}
+        Collider selfCollider
+        {
+            get;
+        }
+    }
 
-	public interface ICollidable2D
-	{
-		Rigidbody2D selfRigidbody2D {
-			get;
-		}
+    public interface ICollidable2D
+    {
+        Rigidbody2D selfRigidbody2D
+        {
+            get;
+        }
 
-		Collider2D selfCollider2D {
-			get;
-		}
-	}
+        Collider2D selfCollider2D
+        {
+            get;
+        }
+    }
 
-	public interface ITransformable
-	{
-		Transform selfTransform {
-			get;
-		}
-	}
+    public interface ITransformable
+    {
+        Transform selfTransform
+        {
+            get;
+        }
+    }
 
-	public interface IRenderable
-	{
-		MeshRenderer selfRenderer {
-			get;
-		}
-	}
+    public interface IRenderable
+    {
+        MeshRenderer selfRenderer
+        {
+            get;
+        }
+    }
 
-	public interface IRenderable2D
-	{
-		SpriteRenderer selfRenderer2D {
-			get;
-		}
-	}
+    public interface IRenderable2D
+    {
+        SpriteRenderer selfRenderer2D
+        {
+            get;
+        }
+    }
 
-	public interface IAnimated
-	{
-		Animator  selfAnimator {
-			get;
-		}
-	}
+    public interface IAnimated
+    {
+        Animator  selfAnimator
+        {
+            get;
+        }
+    }
 
 
-	public interface IStateMachine
-	{
-		void AddState (UpdateDelegate state);
+    public interface IStateMachine
+    {
+        void AddState(UpdateDelegate state);
 
-		void RemoveState (UpdateDelegate state);
+        void RemoveState(UpdateDelegate state);
 
-		void SetToState (UpdateDelegate state);
+        void SetToState(UpdateDelegate state);
 
-		void RemoveAllStates ();
+        void RemoveAllStates();
 
-		void StackState (UpdateDelegate state);
+        void StackState(UpdateDelegate state);
 
-		UpdateDelegate currentState {
-			get;
-		}
-	}
+        UpdateDelegate currentState
+        {
+            get;
+        }
+    }
 
-	//	public interface IInteractable:IIdentifiable
-	//	{
-	//		InteractionDescription interactionDescription {
-	//			get;
-	//		}
-	//
-	//		void Interact (IInteractable other);
-	//
-	//		void SelfInteract ();
-	//
-	//		void SelfInteractCustom (InteractionDescription interactionDescription);
-	//	}
+    //	public interface IInteractable:IIdentifiable
+    //	{
+    //		InteractionDescription interactionDescription {
+    //			get;
+    //		}
+    //
+    //		void Interact (IInteractable other);
+    //
+    //		void SelfInteract ();
+    //
+    //		void SelfInteractCustom (InteractionDescription interactionDescription);
+    //	}
 
-	public interface ICollisionListener
-	{
-		void CollisionDetected (CollisionDetector detector, Collision collision);
+    public interface ICollisionListener
+    {
+        void CollisionDetected(CollisionDetector detector, Collision collision);
 
-		void CollisionStay (CollisionDetector detector, Collision collision);
+        void CollisionStay(CollisionDetector detector, Collision collision);
 
-		void CollisionEnded (CollisionDetector detector, Collision collision);
-	}
+        void CollisionEnded(CollisionDetector detector, Collision collision);
+    }
 
-	public interface ITriggerListener
-	{
-		void TriggerDetected (TriggerDetector detector, Collider other);
+    public interface ITriggerListener
+    {
+        void TriggerDetected(TriggerDetector detector, Collider other);
 
-		void TriggerStay (TriggerDetector detector, Collider other);
+        void TriggerStay(TriggerDetector detector, Collider other);
 
-		void TriggerEnded (TriggerDetector detector, Collider other);
-	}
+        void TriggerEnded(TriggerDetector detector, Collider other);
+    }
 
-	[System.Serializable]
-	public class InteractionDescription
-	{
-		public string sound;
-		public string effect;
-	}
+    [System.Serializable]
+    public class InteractionDescription
+    {
+        public string sound;
+        public string effect;
+    }
 
-	public interface ISubscribable
-	{
-		void Subscribe ();
+    public interface IInitializable
+    {
+        bool isInitialized
+        {
+            get;
+        }
 
-		void Unsubscribe ();
+        bool Initialize();
+    }
 
-		bool isSubscribed {
-			get;
-		}
-	}
+    public interface ISubscribable
+    {
+        bool Subscribe();
 
-	public interface IToggleable
-	{
-		void Toggle ();
+        bool Unsubscribe();
 
-		void Close ();
+        bool isSubscribed
+        {
+            get;
+        }
+    }
 
-		void Open ();
-	}
+    public interface IToggleable
+    {
+        void Toggle();
 
-	public interface IActivatable
-	{
-		void Activate ();
+        void Close();
 
-		bool Update ();
+        void Open();
 
-		void Deactivate ();
-	}
+        bool isOpen{ get; }
+    }
 
-	public interface IComposable<T>
-	{
-		void Compose (T description);
+    public interface IActivatable
+    {
+        void Activate();
 
-		void Decompose ();
-	}
+        bool Update();
 
-	public interface IComposable
-	{
-		void Compose ();
+        void Deactivate();
+    }
 
-		void Decompose ();
-	}
+    public interface IComposable<T>
+    {
+        void Compose(T description);
+
+        void Decompose();
+    }
+
+    public interface IComposable
+    {
+        void Compose();
+
+        void Decompose();
+    }
 }

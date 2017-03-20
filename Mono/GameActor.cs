@@ -3,23 +3,58 @@
     using UnityEngine;
     using System.Collections;
 
-    public class GameActor : MonoBehaviour, ISubscribable, IStateMachine
+    public class GameActor : MonoBehaviour,IInitializable, ISubscribable, IStateMachine
     {
         public bool selfSubscribe = true;
+
+        #region IInitializable implementation
+
+        protected bool _isInitialized = false;
+
+        public virtual bool Initialize()
+        {
+            if (!this._isInitialized)
+            {
+                this._isInitialized = true;
+                return true;
+            }
+            return false;
+        }
+
+        public bool isInitialized
+        {
+            get
+            {
+                return this._isInitialized;
+            }
+        }
+
+        #endregion
 
         #region ISubscribable implementation
 
         protected bool _isSubscribed = false;
 
-        public virtual void Subscribe()
+        public virtual bool Subscribe()
         {
-            Unsubscribe();
-            this._isSubscribed = true;
+            if (!this._isSubscribed)
+            {
+                this._isSubscribed = true;
+                return true;
+            }
+
+            return false;
         }
 
-        public virtual void Unsubscribe()
+        public virtual bool Unsubscribe()
         {
-            this._isSubscribed = false;
+            if (this._isSubscribed)
+            {
+                this._isSubscribed = false;
+                return true;
+            }
+
+            return false;
         }
 
         public bool isSubscribed

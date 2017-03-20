@@ -5,14 +5,41 @@ using System.Collections.Generic;
 namespace PofyTools
 {
 
-    public abstract class StateableActor : MonoBehaviour, IStateable//, ITransformable, ISubscribable
+    public abstract class StateableActor : MonoBehaviour, IStateable, ISubscribable, IInitializable
     {
         #region Variables
 
-        public bool selfSubscribe = true;
         public bool removeAllStatesOnStart = true;
 
         protected List<IState> _stateStack;
+
+        #endregion
+
+        #region IInitializable implementation
+
+        protected bool _isInitialized = false;
+
+        public virtual bool Initialize()
+        {
+            if (!this.isInitialized)
+            {
+                this._selfTransform = this.transform;
+                ConstructAvailableStates();
+                InitializeStateStack();
+
+                this._isInitialized = true;
+                return true;
+            }
+            return false;
+        }
+
+        public virtual bool isInitialized
+        {
+            get
+            {
+                return this._isInitialized;
+            }
+        }
 
         #endregion
 
@@ -20,15 +47,24 @@ namespace PofyTools
 
         protected bool _isSubscribed = false;
 
-        public virtual void Subscribe()
+        public virtual bool Subscribe()
         {
-            Unsubscribe();
-            this._isSubscribed = true;
+            if (!this.isSubscribed)
+            {
+                this._isSubscribed = true;
+                return true;
+            }
+            return false;
         }
 
-        public virtual void Unsubscribe()
+        public virtual bool Unsubscribe()
         {
-            this._isSubscribed = false;
+            if (this.isSubscribed)
+            {
+                this._isSubscribed = false;
+                return true;
+            }
+            return false;
         }
 
         public bool isSubscribed
@@ -42,11 +78,8 @@ namespace PofyTools
 
         protected virtual void OnDestroy()
         {
-            //base.OnDestroy ();
-//			RemoveAllStates ();
             PurgeStateStack();
-            if (this._isSubscribed)
-                Unsubscribe();
+            Unsubscribe();
         }
 
         #endregion
@@ -145,16 +178,13 @@ namespace PofyTools
 
         protected virtual void Awake()
         {
-            this._selfTransform = this.transform;
-            ConstructAvailableStates();
-            InitializeStateStack();
+            Initialize();
         }
 			
         // Use this for initialization
         protected virtual void Start()
         {
-            if (this.selfSubscribe)
-                Subscribe();
+            Subscribe();
 
             if (this.removeAllStatesOnStart)
                 PurgeStateStack();
@@ -214,9 +244,14 @@ namespace PofyTools
 
         #region States
 
-        public abstract void ConstructAvailableStates();
+        public virtual void ConstructAvailableStates()
+        {
+        }
 
-        public abstract void InitializeStateStack();
+        public virtual void InitializeStateStack()
+        {
+            this._stateStack = new List<IState>();
+        }
 
         #endregion
     }
