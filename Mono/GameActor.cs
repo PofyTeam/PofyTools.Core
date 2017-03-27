@@ -68,8 +68,7 @@
 
         protected virtual void OnDestroy()
         {
-            if (this._isSubscribed)
-                Unsubscribe();
+            Unsubscribe();
         }
 
         #endregion
@@ -77,15 +76,13 @@
         // Use this for initialization
         protected virtual void Start()
         {
-            if (this.selfSubscribe)
-                Subscribe();
-			
+            Subscribe();
             RemoveAllStates();
         }
 
         protected virtual void Awake()
         {
-            //
+            Initialize();
         }
 
         #region IStateMachine implementation
