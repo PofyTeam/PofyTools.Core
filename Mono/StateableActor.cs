@@ -5,7 +5,7 @@ using System.Collections.Generic;
 namespace PofyTools
 {
 
-    public abstract class StateableActor : MonoBehaviour, IStateable, ISubscribable, IInitializable
+    public abstract class StateableActor : MonoBehaviour, IStateable, ISubscribable, IInitializable, ITransformable
     {
         #region Variables
 
@@ -99,6 +99,11 @@ namespace PofyTools
                 }
                 else
                     state.ExitState();
+            }
+            else
+            {
+                state.ExitState();
+                state.EnterState();
             }
         }
 
