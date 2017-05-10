@@ -22,7 +22,7 @@
 				}
 			}
 		}
-
+		[SerializeField]
 		private float _current;
 
 		public Range (Vector2 range) : this (Mathf.Min (range [0], range [1]), Mathf.Max (range [0], range [1]))
