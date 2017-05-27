@@ -263,13 +263,36 @@ namespace PofyTools
 
     public class StateObject<T>:IState where T:MonoBehaviour
     {
-        protected T _controlledObject;
+        public IStateDelegate onEnter = IStateIdle;
+        public IStateDelegate onExit = IStateIdle;
 
-        protected bool _hasUpdate = true;
+        public T controlledObject
+        {
+            get;
+            protected set;
+        }
 
         public bool hasUpdate
         {
-            get{ return this._hasUpdate; }
+            get;
+            protected set;
+        }
+
+        public bool isInitialized
+        {
+            get;
+            protected set;
+        }
+
+        public bool isActive
+        {
+            get;
+            protected set;
+        }
+
+
+        public static void IStateIdle()
+        {
         }
 
         #region constructor
@@ -280,7 +303,7 @@ namespace PofyTools
 
         public StateObject(T controlledObject)
         {
-            this._controlledObject = controlledObject;
+            this.controlledObject = controlledObject;
             InitializeState();
         }
 
@@ -290,7 +313,8 @@ namespace PofyTools
 
         public virtual void InitializeState()
         {
-            if (this._controlledObject == null)
+            this.isInitialized = true;
+            if (this.controlledObject = null)
             {
                 Debug.LogError(this.ToString() + " has no controlled object");
             }
@@ -298,7 +322,8 @@ namespace PofyTools
 
         public virtual void EnterState()
         {
-            //do staff on enter
+            this.isActive = true;
+            this.onEnter(this);
         }
 
         public virtual bool UpdateState()
@@ -321,10 +346,33 @@ namespace PofyTools
 
         public virtual void ExitState()
         {
-            //do stuff on exit state
+            this.isActive = false;
+            this.onEnter(this);
         }
 
         #endregion
+    }
+
+    public class TimedStateObject<T>: StateObject<T> where T:MonoBehaviour
+    {
+        protected Range _timeRange;
+        protected AnimationCurve _curve;
+
+        public TimedStateObject(T controlledObject, Range timeRange, AnimationCurve curve)
+        {
+            this.controlledObject = controlledObject;
+            this._timeRange = timeRange;
+            this._curve = curve;
+
+            InitializeState();
+        }
+
+        public virtual void InitializeState(float duration, AnimationCurve curve)
+        {
+            this.hasUpdate = true;
+
+            base.InitializeState();
+        }
     }
 
     public interface IState
@@ -362,4 +410,5 @@ namespace PofyTools
 
     }
 
+    public delegate void IStateDelegate(IState state);
 }
