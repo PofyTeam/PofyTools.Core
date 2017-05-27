@@ -367,6 +367,21 @@ namespace PofyTools
             InitializeState();
         }
 
+        public TimedStateObject(T controlledObject, float duration, AnimationCurve curve)
+            : this(controlledObject, new Range(duration), curve)
+        {
+        }
+
+        public TimedStateObject(T controlledObject, float duration)
+            : this(controlledObject, new Range(duration), null)
+        {
+        }
+
+        public TimedStateObject(T controlledObject)
+            : this(controlledObject, new Range(1), null)
+        {
+        }
+
         public virtual void InitializeState(float duration, AnimationCurve curve)
         {
             this.hasUpdate = true;
@@ -406,6 +421,34 @@ namespace PofyTools
         }
 
     }
+
+    public class DelegateStack : StateObject<MonoBehaviour>
+    {
+        public UpdateDelegate updater;
+
+        void VoidIdle()
+        {
+            
+        }
+
+        public DelegateStack(MonoBehaviour controlledObject)
+            : base(controlledObject)
+        {
+        }
+
+        public override void InitializeState()
+        {
+            this.hasUpdate = true;
+            this.updater = VoidIdle;
+        }
+
+        public override bool UpdateState()
+        {
+            this.updater();
+            return false;
+        }
+    }
+
     #endregion
 
     public interface IState
