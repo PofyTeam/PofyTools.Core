@@ -191,7 +191,7 @@ namespace PofyTools
         {
             Subscribe();
 
-            if (this.removeAllStatesOnStart)
+            if (this.removeAllStatesOnStart || this._stateStack.Count == 0)
                 PurgeStateStack();
         }
 	
@@ -291,7 +291,7 @@ namespace PofyTools
         }
 
 
-        public static void IStateIdle()
+        public static void IStateIdle(IState state)
         {
         }
 
@@ -374,6 +374,39 @@ namespace PofyTools
             base.InitializeState();
         }
     }
+
+    #region Utility States
+    public class BackButtonListenerState : StateObject<MonoBehaviour>
+    {
+        public UpdateDelegate onBackButton;
+
+        public BackButtonListenerState(MonoBehaviour controlledObject)
+            : base(controlledObject)
+        {
+        }
+
+        public void VoidIdle()
+        {
+        }
+
+        public override void InitializeState()
+        {
+            this.onBackButton = VoidIdle;
+            this.hasUpdate = true;
+            base.InitializeState();
+        }
+
+        public override bool LateUpdateState()
+        {
+            if (Input.GetKeyDown(KeyCode.Escape))
+            {
+                this.onBackButton.Invoke();
+            } 
+            return false;
+        }
+
+    }
+    #endregion
 
     public interface IState
     {
