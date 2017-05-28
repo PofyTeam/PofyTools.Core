@@ -388,6 +388,12 @@ namespace PofyTools
 
             base.InitializeState();
         }
+
+        public override void InitializeState()
+        {
+            this.hasUpdate = true;
+            base.InitializeState();
+        }
     }
 
     #region Utility States
