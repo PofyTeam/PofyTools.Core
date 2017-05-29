@@ -76,6 +76,7 @@
             this._items.Add(request.item);
             request.item.Equip(request);
             //TODO: Owner callback
+            request.owner.OnItemEquipped(request);
         }
 
         public bool RemoveItem(SocketActionRequest request)
@@ -84,6 +85,7 @@
             {
                 request.item.Unequip(request);
                 //TODO: Owner callback
+                request.owner.OnItemUnequipped(request);
                 return true;
             }
 
@@ -123,7 +125,7 @@
                     foreach (var item in this._items)
                     {
                         item.Initialize();
-                        item.Equip(request);
+                        item.Equip(request, true);
                     }
                     return true;
                 }
@@ -448,6 +450,10 @@
         bool UnequipAll(SocketActionRequest.ApprovedBy approvedBy = SocketActionRequest.ApprovedBy.None);
 
         bool TryGetItemsOfType<T>(out List<T> list);
+
+        void OnItemEquipped(SocketActionRequest request);
+
+        void OnItemUnequipped(SocketActionRequest request);
     }
 
     public interface ISocketable : ITransformable,IInitializable, ISocketActionRequestResolver// Item
@@ -463,7 +469,7 @@
             get;
         }
 
-        void Equip(SocketActionRequest request);
+        void Equip(SocketActionRequest request, bool inPlace = false);
 
         void Unequip(SocketActionRequest request);
 

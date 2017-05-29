@@ -88,10 +88,10 @@ namespace PofyTools
 
         public void AddState(IState state)
         {
-            state.EnterState();
+            
             if (!this._stateStack.Contains(state))
             {
-				
+                state.EnterState();
                 if (state.hasUpdate)
                 {
                     this._stateStack.Add(state);
@@ -102,8 +102,11 @@ namespace PofyTools
             }
             else
             {
-                state.ExitState();
-                state.EnterState();
+                if (!state.ignoreStacking)
+                {
+                    state.ExitState();
+                    state.EnterState();
+                }
             }
         }
 
@@ -145,6 +148,12 @@ namespace PofyTools
 
         public void StackState(IState state)
         {
+            if (state.ignoreStacking)
+            {
+                if (this._stateStack.Contains(state))
+                    return;
+            }
+
             state.EnterState();
             if (state.hasUpdate)
             {
@@ -285,6 +294,12 @@ namespace PofyTools
         }
 
         public bool isActive
+        {
+            get;
+            protected set;
+        }
+
+        public bool ignoreStacking
         {
             get;
             protected set;
@@ -472,6 +487,8 @@ namespace PofyTools
         void ExitState();
 
         bool hasUpdate{ get; }
+
+        bool ignoreStacking{ get; }
     }
 
     public interface IStateable
