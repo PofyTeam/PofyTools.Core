@@ -314,7 +314,7 @@ namespace PofyTools
         public virtual void InitializeState()
         {
             this.isInitialized = true;
-            if (this.controlledObject = null)
+            if (this.controlledObject == null)
             {
                 Debug.LogError(this.ToString() + " has no controlled object");
             }
