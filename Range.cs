@@ -79,6 +79,16 @@
             get{ return min == max; }
         }
 
+        public bool AtMin
+        {
+            get{ return this._current == this.min; }
+        }
+
+        public bool AtMax
+        {
+            get{ return this._current == this.max; }
+        }
+
         public float Avarege
         {
             get
@@ -244,7 +254,7 @@
 
         public override string ToString()
         {
-            return string.Format("[Min - {0:##.###} , Max - {1:##.###}]", this.min, this.max);
+            return string.Format("[Min - {0:##.###} , Max - {1:##.###},Current - {2:##.###}]", this.min, this.max, this._current);
         }
 
         #endregion
