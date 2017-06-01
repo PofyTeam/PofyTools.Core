@@ -62,13 +62,13 @@
 
         public bool Empty(SocketActionRequest.ApprovedBy approvedBy = SocketActionRequest.ApprovedBy.None)
         {
-            for (int i = 0, max_itemsCount = this._items.Count; i < max_itemsCount; i++)
+            for (int i = this._items.Count - 1; i >= 0; --i)
             {
                 var item = this._items[i];
                 SocketActionRequest.TryUnequipItemFromOwner(this.owner, item, this.id, approvedBy);
             }
 
-            return this._items.Count > 0;
+            return this._items.Count < 0;
         }
 
         public void AddItem(SocketActionRequest request)
@@ -323,7 +323,7 @@
 
         #region API Methods
 
-        public static SocketActionRequest TryEquipItemToOwner(ISocketed owner, ISocketable item, string id, ApprovedBy approvedBy = ApprovedBy.None)
+        public static SocketActionRequest TryEquipItemToOwner(ISocketed owner, ISocketable item, string id = "", ApprovedBy approvedBy = ApprovedBy.None)
         {
             SocketActionRequest request = new SocketActionRequest(action: Socket.Action.Equip, owner: owner, item: item, id: id, approvedBy: approvedBy);
 
