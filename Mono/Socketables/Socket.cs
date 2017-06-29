@@ -71,11 +71,12 @@
             return this._items.Count < 0;
         }
 
-        public void AddItem(SocketActionRequest request)
+        public void AddItem(SocketActionRequest request, bool inPlace = false)
         {
-            this._items.Add(request.item);
-            request.item.Equip(request);
-            //TODO: Owner callback
+            if (!inPlace)
+                this._items.Add(request.item);
+            
+            request.item.Equip(request, inPlace);
             request.owner.OnItemEquipped(request);
         }
 
@@ -121,11 +122,15 @@
 
 
                     GetComponentsInChildren<ISocketable>(this._items);
-                    SocketActionRequest request = new SocketActionRequest(socket: this);
+                   
                     foreach (var item in this._items)
                     {
+                        SocketActionRequest request = new SocketActionRequest(Socket.Action.Equip, owner, item, "", SocketActionRequest.ApprovedByAll, this);
                         item.Initialize();
-                        item.Equip(request, true);
+//                        request = SocketActionRequest.ResolveRequest(request);
+//                        item.Equip(request, true);
+//                        owner.OnItemEquipped(request);
+                        this.AddItem(request, true);
                     }
                     return true;
                 }
@@ -149,14 +154,6 @@
         {
             Initialize();
         }
-
-        #if UNITY_EDITOR
-        void OnDrawGizmos()
-        {
-            Gizmos.color = Color.green;
-            Gizmos.DrawSphere(this.transform.position, 0.1f);
-        }
-        #endif
 
     }
 
@@ -396,8 +393,6 @@
                 return request;
             }
 
-
-
             request = SocketActionRequest.GetApproval(request);
 
             if (request.isAprovedByAll)
@@ -405,7 +400,7 @@
                 if (request.action == Socket.Action.Equip)
                 {    
                     socket = request.socket;
-                    socket.AddItem(request);
+                    socket.AddItem(request, false);
                     return request;
                 }
 

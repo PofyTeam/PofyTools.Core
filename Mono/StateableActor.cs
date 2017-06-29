@@ -88,6 +88,12 @@ namespace PofyTools
 
         public void AddState(IState state)
         {
+            if (state == null)
+            {
+                if (this._stateStack.Count == 0)
+                    this.enabled = false;
+                return;
+            }
             
             if (!this._stateStack.Contains(state))
             {
@@ -169,7 +175,8 @@ namespace PofyTools
         public void SetToState(IState state)
         {
             RemoveAllStates();
-            AddState(state);
+            if (state != null)
+                AddState(state);
         }
 
         #endregion
@@ -205,7 +212,7 @@ namespace PofyTools
         }
 	
         // Update is called once per frame
-        protected void Update()
+        protected virtual void Update()
         {
             IState state = null;
 
@@ -361,8 +368,9 @@ namespace PofyTools
 
         public virtual void ExitState()
         {
+            
             this.isActive = false;
-            this.onEnter(this);
+            this.onExit(this);
         }
 
         #endregion
@@ -489,6 +497,11 @@ namespace PofyTools
         bool hasUpdate{ get; }
 
         bool ignoreStacking{ get; }
+
+        bool isActive
+        {
+            get;
+        }
     }
 
     public interface IStateable
