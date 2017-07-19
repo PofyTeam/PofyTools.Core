@@ -103,6 +103,15 @@
         void CollisionEnded(CollisionDetector detector, Collision collision);
     }
 
+    public interface ICollisionListener2D
+    {
+        void CollisionDetected(CollisionDetector2D detector, Collision2D collision);
+
+        void CollisionStay(CollisionDetector2D detector, Collision2D collision);
+
+        void CollisionEnded(CollisionDetector2D detector, Collision2D collision);
+    }
+
     public interface ITriggerListener
     {
         void TriggerDetected(TriggerDetector detector, Collider other);
@@ -110,6 +119,15 @@
         void TriggerStay(TriggerDetector detector, Collider other);
 
         void TriggerEnded(TriggerDetector detector, Collider other);
+    }
+
+    public interface ITriggerListener2D
+    {
+        void TriggerDetected(TriggerDetector2D detector, Collider2D other);
+
+        void TriggerStay(TriggerDetector2D detector, Collider2D other);
+
+        void TriggerEnded(TriggerDetector2D detector, Collider2D other);
     }
 
     [System.Serializable]
