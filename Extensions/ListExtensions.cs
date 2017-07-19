@@ -1,6 +1,6 @@
 ﻿namespace PofyTools
 {
-using System.Collections;
+    using System.Collections;
     using System.Collections.Generic;
     using UnityEngine;
 
@@ -16,7 +16,7 @@ using System.Collections;
             T result = default(T);
 
             if (count != 0)
-                result = list[Random.Range(0, count - 1)];
+                result = list[Random.Range(0, count)];
             return result;
         }
     }
