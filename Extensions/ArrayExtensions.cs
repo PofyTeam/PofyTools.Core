@@ -5,7 +5,7 @@ using UnityEngine;
 public static class ArrayExtensions
 {
 
-    public static void GetRandom<T>(this T[] array)
+    public static T GetRandom<T>(this T[] array)
     {
         T result = default(T);
 
