@@ -192,4 +192,14 @@
 
         void Decompose();
     }
+
+    public interface IBackButtonListener
+    {
+        bool OnBackButton();
+
+        void OnBackButtonListenerAdd();
+
+        void OnBackButtonListenerRemove();
+    }
+
 }
