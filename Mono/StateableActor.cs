@@ -431,6 +431,7 @@ namespace PofyTools
 
         public void VoidIdle()
         {
+            Debug.Log("Back Button Pressed.");
         }
 
         public override void InitializeState()
