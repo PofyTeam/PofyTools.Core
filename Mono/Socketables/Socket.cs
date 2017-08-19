@@ -26,6 +26,8 @@
         public string id;
         public ISocketed owner;
         public int itemLimit = 1;
+        public bool initializeOnStart = false;
+
         protected List<ISocketable> _items = new List<ISocketable>();
 
         public List<ISocketable> items
@@ -120,17 +122,19 @@
                     this.owner.AddSocket(this);
                     this._selfTransform = this.transform;
 
-
-                    GetComponentsInChildren<ISocketable>(this._items);
-                   
-                    foreach (var item in this._items)
+                    ISocketable item = null;
+                    SocketActionRequest request = default(SocketActionRequest);
+                    foreach (Transform child in this._selfTransform)
                     {
-                        SocketActionRequest request = new SocketActionRequest(Socket.Action.Equip, owner, item, "", SocketActionRequest.ApprovedByAll, this);
-                        item.Initialize();
-//                        request = SocketActionRequest.ResolveRequest(request);
-//                        item.Equip(request, true);
-//                        owner.OnItemEquipped(request);
-                        this.AddItem(request, true);
+                        item = child.GetComponent<ISocketable>();
+
+                        if (item != null)
+                        {
+                            this._items.Add(item);
+                            request = new SocketActionRequest(Socket.Action.Equip, owner, item, "", SocketActionRequest.ApprovedByAll, this);
+                            item.Initialize();
+                            this.AddItem(request, true);
+                        }
                     }
                     return true;
                 }
@@ -152,7 +156,14 @@
 
         void Awake()
         {
-            Initialize();
+            if (!this.initializeOnStart)
+                Initialize();
+        }
+
+        void Start()
+        {
+            if (this.initializeOnStart)
+                Initialize();
         }
 
     }
@@ -264,7 +275,7 @@
         {
             get
             {
-                return this.approvedBy.Has(ApprovedBy.SocketOwner) && this.approvedBy.Has(ApprovedBy.SocketOwner);
+                return this.approvedBy.Has(ApprovedBy.SocketOwner) && this.approvedBy.Has(ApprovedBy.Item);
             }
         }
 
