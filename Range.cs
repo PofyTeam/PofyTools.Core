@@ -56,7 +56,7 @@
 
             Range.Sort(this);
 
-            this.current = this.min;
+            this.current = current;
         }
 
         public Range Clone()
