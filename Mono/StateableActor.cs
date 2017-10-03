@@ -127,7 +127,7 @@ namespace PofyTools
                 this.enabled = false;
         }
 
-        public void RemoveAllStates(bool endStates = true)
+        public void RemoveAllStates(bool endStates = true,bool endPermanent = false)
         {
 			
             if (this._stateStack != null && endStates)
@@ -137,8 +137,11 @@ namespace PofyTools
                 for (int i = count - 1; i >= 0; --i)
                 {
                     state = this._stateStack[i];
-                    this._stateStack.RemoveAt(i);
-                    state.ExitState();
+                    if (!state.isPermanent || endPermanent)
+                    {
+                        this._stateStack.RemoveAt (i);
+                        state.ExitState ();
+                    }
                 }
             }
             PurgeStateStack();
@@ -147,8 +150,13 @@ namespace PofyTools
         public void PurgeStateStack()
         {
             if (this._stateStack != null)
-                this._stateStack.Clear();
-
+            {
+                foreach (var state in this._stateStack)
+                {
+                    state.Deactivate ();
+                }
+                this._stateStack.Clear ();
+            }
             this.enabled = false;
         }
 
@@ -207,7 +215,7 @@ namespace PofyTools
         {
             Subscribe();
 
-            if (this.removeAllStatesOnStart || this._stateStack.Count == 0)
+            if (this.removeAllStatesOnStart/* || this._stateStack.Count == 0*/)
                 PurgeStateStack();
         }
 	
@@ -228,7 +236,7 @@ namespace PofyTools
             }
         }
 
-        protected void FixedUpdate()
+        protected virtual void FixedUpdate()
         {
             IState state = null;
 
@@ -306,12 +314,22 @@ namespace PofyTools
             protected set;
         }
 
+        public void Deactivate ()
+        {
+            this.isActive = false;
+        }
+
         public bool ignoreStacking
         {
             get;
             protected set;
         }
 
+        public bool isPermanent
+        {
+            get;
+            protected set;
+        }
 
         public static void IStateIdle(IState state)
         {
@@ -431,7 +449,6 @@ namespace PofyTools
 
         public void VoidIdle()
         {
-            Debug.Log("Back Button Pressed.");
         }
 
         public override void InitializeState()
@@ -496,13 +513,15 @@ namespace PofyTools
         void ExitState();
 
         bool hasUpdate{ get; }
-
+        bool isPermanent { get; }
         bool ignoreStacking{ get; }
 
         bool isActive
         {
             get;
         }
+
+        void Deactivate ();
     }
 
     public interface IStateable
@@ -515,7 +534,7 @@ namespace PofyTools
 
         void RemoveState(IState state);
 
-        void RemoveAllStates(bool endStates = true);
+        void RemoveAllStates(bool endStates = true,bool endPermanent = false);
 
         void PurgeStateStack();
 
