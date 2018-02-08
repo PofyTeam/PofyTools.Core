@@ -10,7 +10,7 @@
             for (int i = transform.childCount - 1; i >= 0; --i)
             {
                 child = transform.GetChild (i);
-                GameObject.Destroy (child.gameObject);
+                if (Application.isPlaying) GameObject.Destroy (child.gameObject); else GameObject.DestroyImmediate (child.gameObject);
             }
         }
 
