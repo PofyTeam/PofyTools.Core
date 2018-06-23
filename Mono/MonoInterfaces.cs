@@ -163,11 +163,13 @@
     {
         void Toggle();
 
+        void Toggle (bool on);
+
         void Close();
 
         void Open();
 
-        bool isOpen{ get; }
+        bool IsOpen{ get; }
     }
 
     public interface IActivatable

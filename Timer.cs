@@ -5,7 +5,7 @@ using UnityEngine;
 namespace PofyTools
 {
     public delegate void TimerDelegate (Timer timer);
-    [System.Serializable]
+    //[System.Serializable]
     public class Timer : IInitializable
     {
         protected float _timerDuration;
@@ -116,7 +116,7 @@ namespace PofyTools
         #endregion
 
         #region Count Down
-        protected void SetTimer (float duration)
+        public void SetTimer (float duration)
         {
             this._timerDuration = duration;
             this._nextTimestamp = Time.time + duration;
@@ -138,7 +138,7 @@ namespace PofyTools
         /// Gets a value indicating whether this <see cref="PofyTools.Timer"/> has reached next timestamp.
         /// </summary>
         /// <value><c>true</c> if is ready; otherwise, <c>false</c>.</value>
-        public bool isReady
+        public bool IsReady
         {
             get
             {
@@ -165,7 +165,7 @@ namespace PofyTools
         /// <param name="force">If set to <c>true</c> force execution.</param>
         public bool TryExecute (bool force = false)
         {
-            if (this.isReady || force)
+            if (this.IsReady || force)
             {
                 FireEvent ();
                 return true;
@@ -186,13 +186,6 @@ namespace PofyTools
         }
 
         #endregion
-
-
-
-
-
-
-
 
     }
 }

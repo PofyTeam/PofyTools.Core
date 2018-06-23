@@ -197,6 +197,11 @@ namespace PofyTools
         {
             get
             {
+                if (this._selfTransform == null)
+                {
+                    Debug.LogError (this.name + " : " + this.GetType ().ToString ());
+                    return this.transform;
+                }
                 return this._selfTransform;
             }
         }
@@ -288,8 +293,8 @@ namespace PofyTools
 
     public class StateObject<T> : IState where T : MonoBehaviour
     {
-        public IStateDelegate onEnter = IStateIdle;
-        public IStateDelegate onExit = IStateIdle;
+        //public IStateDelegate onEnter = IStateIdle;
+        //public IStateDelegate onExit = IStateIdle;
 
         public T controlledObject
         {
@@ -332,9 +337,9 @@ namespace PofyTools
             protected set;
         }
 
-        public static void IStateIdle (IState state)
-        {
-        }
+        //public static void IStateIdle (IState state)
+        //{
+        //}
 
         #region constructor
 
@@ -364,7 +369,7 @@ namespace PofyTools
         public virtual void EnterState ()
         {
             this.isActive = true;
-            this.onEnter (this);
+            //this.onEnter (this);
         }
 
         public virtual bool UpdateState ()
@@ -389,7 +394,7 @@ namespace PofyTools
         {
 
             this.isActive = false;
-            this.onExit (this);
+            //this.onExit (this);
         }
 
         #endregion
@@ -442,7 +447,7 @@ namespace PofyTools
     {
         public Timer timer = null;
 
-        public TimerStateObject (T controlledObject, float timerDuration) : this (controlledObject, new Timer("timer",timerDuration))
+        public TimerStateObject (T controlledObject, float timerDuration) : this (controlledObject, new Timer ("timer", timerDuration))
         {
         }
 
