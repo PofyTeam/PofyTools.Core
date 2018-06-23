@@ -15,17 +15,17 @@ namespace PofyTools
 
         #endregion
 
-        #region IInitializable implementation
+        #region IInitializable
 
         protected bool _isInitialized = false;
 
-        public virtual bool Initialize ()
+        public virtual bool Initialize()
         {
-            if (!this.isInitialized)
+            if (!this.IsInitialized)
             {
                 this._selfTransform = this.transform;
-                ConstructAvailableStates ();
-                InitializeStateStack ();
+                ConstructAvailableStates();
+                InitializeStateStack();
 
                 this._isInitialized = true;
                 return true;
@@ -33,7 +33,7 @@ namespace PofyTools
             return false;
         }
 
-        public virtual bool isInitialized
+        public virtual bool IsInitialized
         {
             get
             {
@@ -43,13 +43,13 @@ namespace PofyTools
 
         #endregion
 
-        #region ISubscribable implementation
+        #region ISubscribable
 
         protected bool _isSubscribed = false;
 
-        public virtual bool Subscribe ()
+        public virtual bool Subscribe()
         {
-            if (!this.isSubscribed)
+            if (!this.IsSubscribed)
             {
                 this._isSubscribed = true;
                 return true;
@@ -57,9 +57,9 @@ namespace PofyTools
             return false;
         }
 
-        public virtual bool Unsubscribe ()
+        public virtual bool Unsubscribe()
         {
-            if (this.isSubscribed)
+            if (this.IsSubscribed)
             {
                 this._isSubscribed = false;
                 return true;
@@ -67,7 +67,7 @@ namespace PofyTools
             return false;
         }
 
-        public bool isSubscribed
+        public bool IsSubscribed
         {
             get
             {
@@ -76,17 +76,17 @@ namespace PofyTools
 
         }
 
-        protected virtual void OnDestroy ()
+        protected virtual void OnDestroy()
         {
-            PurgeStateStack ();
-            Unsubscribe ();
+            PurgeStateStack();
+            Unsubscribe();
         }
 
         #endregion
 
-        #region IStateable implementation
+        #region IStateable
 
-        public void AddState (IState state)
+        public void AddState(IState state)
         {
             if (state == null)
             {
@@ -95,39 +95,40 @@ namespace PofyTools
                 return;
             }
 
-            if (!this._stateStack.Contains (state))
+            if (!this._stateStack.Contains(state))
             {
-                state.EnterState ();
-                if (state.hasUpdate)
+                state.EnterState();
+                if (state.HasUpdate)
                 {
-                    this._stateStack.Add (state);
+                    this._stateStack.Add(state);
+                    this._stateStack.Sort((x, y) => x.Priority.CompareTo(y.Priority));
                     this.enabled = true;
                 }
                 else
-                    state.ExitState ();
+                    state.ExitState();
             }
             else
             {
-                if (!state.ignoreStacking)
+                if (!state.IgnoreStacking)
                 {
-                    state.ExitState ();
-                    state.EnterState ();
+                    state.ExitState();
+                    state.EnterState();
                 }
             }
         }
 
-        public void RemoveState (IState state)
+        public void RemoveState(IState state)
         {
-            if (this._stateStack.Remove (state))
+            if (this._stateStack.Remove(state))
             {
-                state.ExitState ();
+                state.ExitState();
             }
 
             if (this._stateStack.Count == 0)
                 this.enabled = false;
         }
 
-        public void RemoveAllStates (bool endPermanent = false)
+        public void RemoveAllStates(bool endPermanent = false, int priority = 0)
         {
 
             if (this._stateStack != null)
@@ -137,69 +138,71 @@ namespace PofyTools
                 for (int i = count - 1; i >= 0; --i)
                 {
                     state = this._stateStack[i];
-                    if (!state.isPermanent || endPermanent)
+                    if (!state.IsPermanent || endPermanent)
                     {
-                        this._stateStack.RemoveAt (i);
-                        state.ExitState ();
+                        if (state.Priority > priority)
+                        {
+                            this._stateStack.RemoveAt(i);
+                            state.ExitState();
+                        }
                     }
                 }
             }
-            //PurgeStateStack();
         }
 
-        public void PurgeStateStack ()
+        public void PurgeStateStack()
         {
             if (this._stateStack != null)
             {
                 foreach (var state in this._stateStack)
                 {
-                    state.Deactivate ();
+                    state.Deactivate();
                 }
-                this._stateStack.Clear ();
+                this._stateStack.Clear();
             }
             this.enabled = false;
         }
 
-        public void StackState (IState state)
+        public void StackState(IState state)
         {
-            if (state.ignoreStacking)
+            if (state.IgnoreStacking)
             {
-                if (this._stateStack.Contains (state))
+                if (this._stateStack.Contains(state))
                     return;
             }
 
-            state.EnterState ();
-            if (state.hasUpdate)
+            state.EnterState();
+            if (state.HasUpdate)
             {
 
-                this._stateStack.Add (state);
+                this._stateStack.Add(state);
             }
             else
             {
-                AddState (state);
+                AddState(state);
             }
         }
 
-        public void SetToState (IState state)
+        public void SetToState(IState state)
         {
-            RemoveAllStates ();
+            RemoveAllStates();
             if (state != null)
-                AddState (state);
+                AddState(state);
         }
 
         #endregion
 
-        #region ITransformable implementation
+        #region ITransformable
 
         protected Transform _selfTransform;
 
-        public Transform selfTransform
+        public Transform SelfTransform
         {
             get
             {
                 if (this._selfTransform == null)
                 {
-                    Debug.LogError (this.name + " : " + this.GetType ().ToString ());
+                    Debug.LogError(this.name + " : " + this.GetType().ToString());
                     return this.transform;
                 }
                 return this._selfTransform;
@@ -210,22 +213,22 @@ namespace PofyTools
 
         #region Mono
 
-        protected virtual void Awake ()
+        protected virtual void Awake()
         {
-            Initialize ();
+            Initialize();
         }
 
         // Use this for initialization
-        protected virtual void Start ()
+        protected virtual void Start()
         {
-            Subscribe ();
+            Subscribe();
 
-            if (this.removeAllStatesOnStart/* || this._stateStack.Count == 0*/)
-                PurgeStateStack ();
+            if (this.removeAllStatesOnStart)
+                PurgeStateStack();
         }
 
         // Update is called once per frame
-        protected virtual void Update ()
+        protected virtual void Update()
         {
             IState state = null;
 
@@ -234,15 +237,15 @@ namespace PofyTools
 
                 state = this._stateStack[i];
 
-                if (state.UpdateState ())
+                if (state.UpdateState())
                 {
-                    this._stateStack.RemoveAt (i);
-                    state.ExitState ();
+                    this._stateStack.RemoveAt(i);
+                    state.ExitState();
                 }
             }
         }
 
-        protected virtual void FixedUpdate ()
+        protected virtual void FixedUpdate()
         {
             IState state = null;
 
@@ -250,16 +253,16 @@ namespace PofyTools
             {
                 state = this._stateStack[i];
 
-                if (state.FixedUpdateState ())
+                if (state.FixedUpdateState())
                 {
-                    this._stateStack.RemoveAt (i);
-                    state.ExitState ();
+                    this._stateStack.RemoveAt(i);
+                    state.ExitState();
 
                 }
             }
         }
 
-        protected virtual void LateUpdate ()
+        protected virtual void LateUpdate()
         {
             IState state = null;
 
@@ -267,10 +270,10 @@ namespace PofyTools
             {
                 state = this._stateStack[i];
 
-                if (state.LateUpdateState ())
+                if (state.LateUpdateState())
                 {
-                    this._stateStack.RemoveAt (i);
-                    state.ExitState ();
+                    this._stateStack.RemoveAt(i);
+                    state.ExitState();
                 }
             }
         }
@@ -279,13 +282,13 @@ namespace PofyTools
 
         #region States
 
-        public virtual void ConstructAvailableStates ()
+        public virtual void ConstructAvailableStates()
         {
         }
 
-        public virtual void InitializeStateStack ()
+        public virtual void InitializeStateStack()
         {
-            this._stateStack = new List<IState> ();
+            this._stateStack = new List<IState>();
         }
 
         #endregion
@@ -293,111 +296,119 @@ namespace PofyTools
 
     public class StateObject<T> : IState where T : MonoBehaviour
     {
-        //public IStateDelegate onEnter = IStateIdle;
-        //public IStateDelegate onExit = IStateIdle;
 
-        public T controlledObject
+        public T ControlledObject
         {
             get;
             protected set;
         }
 
-        public bool hasUpdate
+        public bool HasUpdate
         {
             get;
             protected set;
         }
 
-        public bool isInitialized
+        public bool IsInitialized
         {
             get;
             protected set;
         }
 
-        public bool isActive
+        public bool IsActive
         {
             get;
             protected set;
         }
 
-        public void Deactivate ()
+        public void Deactivate()
         {
-            this.isActive = false;
+            this.IsActive = false;
         }
 
-        public bool ignoreStacking
+        public bool IgnoreStacking
         {
             get;
             protected set;
         }
 
-        public bool isPermanent
+        public bool IsPermanent
         {
             get;
             protected set;
         }
 
-        //public static void IStateIdle (IState state)
-        //{
-        //}
+        public int Priority
+        {
+            get; set;
+        }
 
-        #region constructor
+        #region Constructor
 
-        public StateObject ()
+        public StateObject()
         {
         }
 
-        public StateObject (T controlledObject)
+        public StateObject(T controlledObject)
         {
-            this.controlledObject = controlledObject;
-            InitializeState ();
+            this.ControlledObject = controlledObject;
+            InitializeState();
         }
 
         #endregion
 
         #region IState implementation
 
-        public virtual void InitializeState ()
+        public virtual void InitializeState()
         {
-            this.isInitialized = true;
-            if (this.controlledObject == null)
+            this.IsInitialized = true;
+            if (this.ControlledObject == null)
             {
-                Debug.LogError (this.ToString () + " has no controlled object");
+                Debug.LogError(this.ToString() + " has no controlled object");
             }
         }
 
-        public virtual void EnterState ()
+        public virtual void EnterState()
         {
-            this.isActive = true;
+            this.IsActive = true;
             //this.onEnter (this);
         }
 
-        public virtual bool UpdateState ()
+        public virtual bool UpdateState()
         {
             //return true on exit condition
             return false;
         }
 
-        public virtual bool FixedUpdateState ()
+        public virtual bool FixedUpdateState()
         {
             //do fixed stuff
             return false;
         }
 
-        public virtual bool LateUpdateState ()
+        public virtual bool LateUpdateState()
         {
             //do late state
             return false;
         }
 
-        public virtual void ExitState ()
+        public virtual void ExitState()
         {
 
-            this.isActive = false;
+            this.IsActive = false;
             //this.onExit (this);
         }
 
         #endregion
+
+        public T this[int arg]
+        {
+            get
+            {
+                return this.ControlledObject;
+            }
+        }
+
     }
 
     public class TimedStateObject<T> : StateObject<T> where T : MonoBehaviour
@@ -405,41 +416,41 @@ namespace PofyTools
         protected Range _timeRange;
         protected AnimationCurve _curve;
 
-        public TimedStateObject (T controlledObject, Range timeRange, AnimationCurve curve)
+        public TimedStateObject(T controlledObject, Range timeRange, AnimationCurve curve)
         {
-            this.controlledObject = controlledObject;
+            this.ControlledObject = controlledObject;
             this._timeRange = timeRange;
             this._curve = curve;
 
-            InitializeState ();
+            InitializeState();
         }
 
-        public TimedStateObject (T controlledObject, float duration, AnimationCurve curve)
-            : this (controlledObject, new Range (duration), curve)
+        public TimedStateObject(T controlledObject, float duration, AnimationCurve curve)
+            : this(controlledObject, new Range(duration), curve)
         {
         }
 
-        public TimedStateObject (T controlledObject, float duration)
-            : this (controlledObject, new Range (duration), null)
+        public TimedStateObject(T controlledObject, float duration)
+            : this(controlledObject, new Range(duration), null)
         {
         }
 
-        public TimedStateObject (T controlledObject)
-            : this (controlledObject, new Range (1), null)
+        public TimedStateObject(T controlledObject)
+            : this(controlledObject, new Range(1), null)
         {
         }
 
-        public virtual void InitializeState (float duration, AnimationCurve curve)
+        public virtual void InitializeState(float duration, AnimationCurve curve)
         {
-            this.hasUpdate = true;
+            this.HasUpdate = true;
 
-            base.InitializeState ();
+            base.InitializeState();
         }
 
-        public override void InitializeState ()
+        public override void InitializeState()
         {
-            this.hasUpdate = true;
-            base.InitializeState ();
+            this.HasUpdate = true;
+            base.InitializeState();
         }
     }
 
@@ -447,19 +458,19 @@ namespace PofyTools
     {
         public Timer timer = null;
 
-        public TimerStateObject (T controlledObject, float timerDuration) : this (controlledObject, new Timer ("timer", timerDuration))
+        public TimerStateObject(T controlledObject, float timerDuration) : this(controlledObject, new Timer("timer", timerDuration))
         {
         }
 
-        public TimerStateObject (T controlledObject, Timer timer) : base (controlledObject)
+        public TimerStateObject(T controlledObject, Timer timer) : base(controlledObject)
         {
             this.timer = timer;
         }
 
-        public override void InitializeState ()
+        public override void InitializeState()
         {
-            this.hasUpdate = true;
-            base.InitializeState ();
+            this.HasUpdate = true;
+            base.InitializeState();
         }
     }
 
@@ -468,27 +479,27 @@ namespace PofyTools
     {
         public UpdateDelegate onBackButton;
 
-        public BackButtonListenerState (MonoBehaviour controlledObject)
-            : base (controlledObject)
+        public BackButtonListenerState(MonoBehaviour controlledObject)
+            : base(controlledObject)
         {
         }
 
-        public void VoidIdle ()
+        public void VoidIdle()
         {
         }
 
-        public override void InitializeState ()
+        public override void InitializeState()
         {
             this.onBackButton = VoidIdle;
-            this.hasUpdate = true;
-            base.InitializeState ();
+            this.HasUpdate = true;
+            base.InitializeState();
         }
 
-        public override bool LateUpdateState ()
+        public override bool LateUpdateState()
         {
-            if (Input.GetKeyDown (KeyCode.Escape))
+            if (Input.GetKeyDown(KeyCode.Escape))
             {
-                this.onBackButton.Invoke ();
+                this.onBackButton.Invoke();
             }
             return false;
         }
@@ -499,25 +510,25 @@ namespace PofyTools
     {
         public UpdateDelegate updater;
 
-        void VoidIdle ()
+        void VoidIdle()
         {
 
         }
 
-        public DelegateStack (MonoBehaviour controlledObject)
-            : base (controlledObject)
+        public DelegateStack(MonoBehaviour controlledObject)
+            : base(controlledObject)
         {
         }
 
-        public override void InitializeState ()
+        public override void InitializeState()
         {
-            this.hasUpdate = true;
+            this.HasUpdate = true;
             this.updater = VoidIdle;
         }
 
-        public override bool UpdateState ()
+        public override bool UpdateState()
         {
-            this.updater ();
+            this.updater();
             return false;
         }
     }
@@ -526,47 +537,48 @@ namespace PofyTools
 
     public interface IState
     {
-        void InitializeState ();
+        void InitializeState();
 
-        void EnterState ();
+        void EnterState();
 
-        bool UpdateState ();
+        bool UpdateState();
 
-        bool FixedUpdateState ();
+        bool FixedUpdateState();
 
-        bool LateUpdateState ();
+        bool LateUpdateState();
 
-        void ExitState ();
+        void ExitState();
 
-        bool hasUpdate { get; }
-        bool isPermanent { get; }
-        bool ignoreStacking { get; }
+        bool HasUpdate { get; }
+        bool IsPermanent { get; }
+        int Priority { get; }
+        bool IgnoreStacking { get; }
 
-        bool isActive
+        bool IsActive
         {
             get;
         }
 
-        void Deactivate ();
+        void Deactivate();
     }
 
     public interface IStateable
     {
-        void InitializeStateStack ();
+        void InitializeStateStack();
 
-        void ConstructAvailableStates ();
+        void ConstructAvailableStates();
 
-        void AddState (IState state);
+        void AddState(IState state);
 
-        void RemoveState (IState state);
+        void RemoveState(IState state);
 
-        void RemoveAllStates (bool endPermanent = false);
+        void RemoveAllStates(bool endPermanent = false, int priority = 0);
 
-        void PurgeStateStack ();
+        void PurgeStateStack();
 
-        void StackState (IState state);
+        void StackState(IState state);
 
     }
 
-    public delegate void IStateDelegate (IState state);
+    public delegate void IStateDelegate(IState state);
 }

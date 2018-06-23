@@ -5,7 +5,7 @@ using UnityEngine;
 namespace PofyTools
 {
     public delegate void TimerDelegate (Timer timer);
-    //[System.Serializable]
+
     public class Timer : IInitializable
     {
         protected float _timerDuration;
@@ -13,7 +13,7 @@ namespace PofyTools
         protected float _nextTimestamp;
 
         protected string _id;
-        public string id
+        public string Id
         {
             get { return this._id; }
         }
@@ -69,7 +69,7 @@ namespace PofyTools
         /// Gets a value indicating whether this <see cref="PofyTools.Timer"/> is initialized.
         /// </summary>
         /// <value><c>true</c> if is initialized; otherwise, <c>false</c>.</value>
-        public bool isInitialized
+        public bool IsInitialized
         {
             get;
             protected set;
@@ -81,10 +81,10 @@ namespace PofyTools
 
         public virtual bool Initialize ()
         {
-            if (!this.isInitialized)
+            if (!this.IsInitialized)
             {
                 this._onEvent = this.IdleEventListener;
-                this.isInitialized = true;
+                this.IsInitialized = true;
                 return true;
             }
 
@@ -105,7 +105,7 @@ namespace PofyTools
         /// <summary>
         /// Time in seconds since counter started via StartCounter().
         /// </summary>
-        public float counter
+        public float Counter
         {
             get
             {
@@ -126,7 +126,7 @@ namespace PofyTools
         /// Gets the next timestamp in seconds.
         /// </summary>
         /// <value>The next timestamp in seconds.</value>
-        public float nextTimestamp
+        public float NextTimestamp
         {
             get
             {
@@ -150,7 +150,7 @@ namespace PofyTools
         /// Gets the time left for cooldown in seconds. Time left is difference between next timestamp and Time.time maxed at 0.
         /// </summary>
         /// <value>The time left.</value>
-        public float timeLeft
+        public float TimeLeft
         {
             get
             {

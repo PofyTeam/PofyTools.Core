@@ -9,7 +9,7 @@
 
 		protected Transform _selfTransform;
 
-		public Transform selfTransform {
+		public Transform SelfTransform {
 			get {
 				return this._selfTransform;
 			}
@@ -21,7 +21,7 @@
 
 		protected Collider _selfCollider;
 
-		public Collider selfCollider {
+		public Collider SelfCollider {
 			get {
 				return this._selfCollider;
 			}
@@ -29,7 +29,7 @@
 
 		protected Rigidbody _selfRigidbody;
 
-		public Rigidbody selfRigidbody {
+		public Rigidbody SelfRigidbody {
 			get {
 				return this._selfRigidbody;
 			}

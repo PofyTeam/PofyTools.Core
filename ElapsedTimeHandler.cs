@@ -8,8 +8,6 @@ namespace PofyTools
     {
         protected Range _cooldownRange;
         public Range initialCooldownRange;
-        //public Range cooldownRange;
-        // protected UpdateDelegate _onEvent = null;
 
         #region Constructors
 

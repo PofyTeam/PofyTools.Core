@@ -1,17 +1,15 @@
 ﻿namespace PofyTools
 {
     using UnityEngine;
-    using System.Collections;
-
 
     public interface ICollidable
     {
-        Rigidbody selfRigidbody
+        Rigidbody SelfRigidbody
         {
             get;
         }
 
-        Collider selfCollider
+        Collider SelfCollider
         {
             get;
         }
@@ -19,12 +17,12 @@
 
     public interface ICollidable2D
     {
-        Rigidbody2D selfRigidbody2D
+        Rigidbody2D SelfRigidbody2D
         {
             get;
         }
 
-        Collider2D selfCollider2D
+        Collider2D SelfCollider2D
         {
             get;
         }
@@ -32,7 +30,7 @@
 
     public interface ITransformable
     {
-        Transform selfTransform
+        Transform SelfTransform
         {
             get;
         }
@@ -40,7 +38,7 @@
 
     public interface IRenderable
     {
-        MeshRenderer selfRenderer
+        MeshRenderer SelfRenderer
         {
             get;
         }
@@ -48,7 +46,7 @@
 
     public interface IRenderable2D
     {
-        SpriteRenderer selfRenderer2D
+        SpriteRenderer SelfRenderer2D
         {
             get;
         }
@@ -56,12 +54,11 @@
 
     public interface IAnimated
     {
-        Animator  selfAnimator
+        Animator  SelfAnimator
         {
             get;
         }
     }
-
 
     public interface IStateMachine
     {
@@ -75,7 +72,7 @@
 
         void StackState(UpdateDelegate state);
 
-        UpdateDelegate currentState
+        UpdateDelegate CurrentState
         {
             get;
         }
@@ -139,7 +136,7 @@
 
     public interface IInitializable
     {
-        bool isInitialized
+        bool IsInitialized
         {
             get;
         }
@@ -153,7 +150,7 @@
 
         bool Unsubscribe();
 
-        bool isSubscribed
+        bool IsSubscribed
         {
             get;
         }
@@ -176,7 +173,7 @@
     {
         void Activate();
 
-        bool Update();
+        bool Update(float deltaTime);
 
         void Deactivate();
     }

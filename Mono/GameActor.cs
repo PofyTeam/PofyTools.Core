@@ -21,7 +21,7 @@
             return false;
         }
 
-        public bool isInitialized
+        public bool IsInitialized
         {
             get
             {
@@ -57,7 +57,7 @@
             return false;
         }
 
-        public bool isSubscribed
+        public bool IsSubscribed
         {
             get
             {
@@ -134,7 +134,7 @@
             this.enabled = true;
         }
 
-        public UpdateDelegate currentState
+        public UpdateDelegate CurrentState
         {
             get
             {

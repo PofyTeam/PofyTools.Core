@@ -28,78 +28,58 @@
         public int itemLimit = 1;
         public bool initializeOnStart = false;
 
-        [Header ("Offsets")]
+        [Header("Offsets")]
         public Vector3 socketPositionOffset = Vector3.zero;
         public Vector3 socketRotationOffset = Vector3.zero;
         public Vector3 socketScaleOffset = Vector3.one;
 
-        protected List<ISocketable> _items = new List<ISocketable> ();
+        protected List<ISocketable> _items = new List<ISocketable>();
 
-        public List<ISocketable> items
-        {
-            get
-            {
-                if (this._items == null)
-                    this._items = new List<ISocketable> (this.itemLimit);
+        public List<ISocketable> Items { get { return this._items; } }
+        public bool IsEmpty { get { return this._items.Count == 0; } }
+        public int ItemCount { get { return this._items.Count; } }
 
-                return this._items;
-            }
-        }
-
-        public bool hasAnyItem
-        {
-            get
-            {
-                if (this._items == null)
-                    this._items = new List<ISocketable> (this.itemLimit);
-
-                return this._items.Count > 0;
-            }
-        }
-
-        public int itemCount
-        {
-            get
-            {
-                if (this._items == null)
-                    this._items = new List<ISocketable> (this.itemLimit);
-                return this._items.Count;
-            }
-        }
-
-        public bool Empty (SocketActionRequest.ApprovedBy approvedBy = SocketActionRequest.ApprovedBy.None)
+        /// <summary>
+        /// Removes all items from socket with provided approval
+        /// </summary>
+        /// <param name="approvedBy"></param>
+        /// <returns></returns>
+        public bool Empty(SocketActionRequest.ApprovedBy approvedBy = SocketActionRequest.ApprovedBy.None)
         {
             for (int i = this._items.Count - 1; i >= 0; --i)
             {
                 var item = this._items[i];
-                SocketActionRequest.TryUnequipItemFromOwner (this.owner, item, this.id, approvedBy);
+                SocketActionRequest.TryUnequipItemFromOwner(this.owner, item, this.id, approvedBy);
             }
 
             return this._items.Count < 0;
         }
 
-        public void AddItem (SocketActionRequest request, bool inPlace = false)
+        /// <summary>
+        /// Add socketable to this socket and call equip callbacks on item and owner.
+        /// </summary>
+        /// <param name="request"></param>
+        /// <param name="inPlace"></param>
+        public void AddItem(SocketActionRequest request, bool inPlace = false)
         {
-            //var item = request.item;
+            this._items.Add(request.item);
 
-            //if (!inPlace)
-            //{
-
-            //}
-
-            this._items.Add (request.item);
-
-            request.item.Equip (request, inPlace);
-            request.owner.OnItemEquipped (request);
+            request.item.Equip(request, inPlace);
+            request.owner.OnItemEquipped(request);
         }
 
-        public bool RemoveItem (SocketActionRequest request)
+        /// <summary>
+        /// Removes item provided in request struct.
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        public bool RemoveItem(SocketActionRequest request)
         {
-            if (this._items.Remove (request.item))
+            if (this._items.Remove(request.item))
             {
-                request.item.Unequip (request);
+                request.item.Unequip(request);
                 //TODO: Owner callback
-                request.owner.OnItemUnequipped (request);
+                request.owner.OnItemUnequipped(request);
                 return true;
             }
 
@@ -110,7 +90,7 @@
 
         protected Transform _selfTransform;
 
-        public Transform selfTransform
+        public Transform SelfTransform
         {
             get
             {
@@ -122,30 +102,30 @@
 
         #region IInitializable implementation
 
-        public bool Initialize ()
+        public bool Initialize()
         {
             if (!this._isInitialized)
             {
                 if (this.owner == null)
-                    this.owner = GetComponentInParent<ISocketed> ();
+                    this.owner = GetComponentInParent<ISocketed>();
 
                 if (this.owner != null)
                 {
-                    this.owner.AddSocket (this);
+                    this.owner.AddSocket(this);
                     this._selfTransform = this.transform;
 
                     ISocketable item = null;
-                    SocketActionRequest request = default (SocketActionRequest);
+                    SocketActionRequest request = default(SocketActionRequest);
                     foreach (Transform child in this._selfTransform)
                     {
-                        item = child.GetComponent<ISocketable> ();
+                        item = child.GetComponent<ISocketable>();
 
                         if (item != null)
                         {
-                            item.Initialize ();
-                            request = new SocketActionRequest (action: Socket.Action.Equip, owner: owner, item: item, socket: this);
+                            item.Initialize();
+                            request = new SocketActionRequest(action: Socket.Action.Equip, owner: owner, item: item, socket: this);
 
-                            this.AddItem (request, true);
+                            this.AddItem(request, true);
                         }
                     }
                 }
@@ -157,26 +137,20 @@
 
         protected bool _isInitialized = false;
 
-        public bool isInitialized
-        {
-            get
-            {
-                return this._isInitialized;
-            }
-        }
+        public bool IsInitialized { get { return this._isInitialized; } }
 
         #endregion
 
-        void Awake ()
+        void Awake()
         {
             if (!this.initializeOnStart)
-                Initialize ();
+                Initialize();
         }
 
-        void Start ()
+        void Start()
         {
             if (this.initializeOnStart)
-                Initialize ();
+                Initialize();
         }
 
     }
@@ -273,9 +247,9 @@
                 if (this._socket == null)
                 {
                     if ((int)this._action <= 2)
-                        this._socket = this._owner.GetSocket (this.id);
+                        this._socket = this._owner.GetSocket(this.id);
                     if (this._socket == null)
-                        Debug.LogWarning (TAG + "No socket found for the id: " + this.id);
+                        Debug.LogWarning(TAG + "No socket found for the id: " + this.id);
                 }
 
                 return this._socket;
@@ -290,30 +264,30 @@
         {
             get
             {
-                return this.approvedBy.Has (ApprovedBy.SocketOwner) && this.approvedBy.Has (ApprovedBy.Item);
+                return this.approvedBy.Has(ApprovedBy.SocketOwner) && this.approvedBy.Has(ApprovedBy.Item);
             }
         }
 
-        public void ApproveByOwner (ISocketed owner)
+        public void ApproveByOwner(ISocketed owner)
         {
             if (owner == this._owner)
-                this.approvedBy = this.approvedBy.Add (ApprovedBy.SocketOwner);
+                this.approvedBy = this.approvedBy.Add(ApprovedBy.SocketOwner);
         }
 
-        public void ApproveByItem (ISocketable item)
+        public void ApproveByItem(ISocketable item)
         {
             if (item == this._item)
-                this.approvedBy = this.approvedBy.Add (ApprovedBy.Item);
+                this.approvedBy = this.approvedBy.Add(ApprovedBy.Item);
         }
 
-        public void RevokeApproval ()
+        public void RevokeApproval()
         {
             this.approvedBy = ApprovedBy.None;
         }
 
-        public void ForceApproval ()
+        public void ForceApproval()
         {
-            this._approvedBy = this._approvedBy.Add (ApprovedBy.SocketOwner);
+            this._approvedBy = this._approvedBy.Add(ApprovedBy.SocketOwner);
             this._approvedBy = SocketActionRequest.ApprovedByAll;
         }
 
@@ -321,7 +295,7 @@
 
         #region Constructor
 
-        public SocketActionRequest (Socket.Action action = Socket.Action.None, ISocketed owner = null, ISocketable item = null, string id = "", ApprovedBy approvedBy = ApprovedBy.None, Socket socket = null)
+        public SocketActionRequest(Socket.Action action = Socket.Action.None, ISocketed owner = null, ISocketable item = null, string id = "", ApprovedBy approvedBy = ApprovedBy.None, Socket socket = null)
         {
             this._action = action;
             this._owner = owner;
@@ -337,32 +311,32 @@
 
         #region Object
 
-        public override string ToString ()
+        public override string ToString()
         {
-            return string.Format ("[SocketActionRequest: approvedBy={0}, action={1}, item={2}, owner={3}, id={4}, socket={5}, isAprovedByAll={6}]", approvedBy, action, item, owner, id, socket, isAprovedByAll);
+            return string.Format("[SocketActionRequest: approvedBy={0}, action={1}, item={2}, owner={3}, id={4}, socket={5}, isAprovedByAll={6}]", approvedBy, action, item, owner, id, socket, isAprovedByAll);
         }
 
         #endregion
 
         #region API Methods
 
-        public static SocketActionRequest TryEquipItemToOwner (ISocketed owner, ISocketable item, string id = "", ApprovedBy approvedBy = ApprovedBy.None)
+        public static SocketActionRequest TryEquipItemToOwner(ISocketed owner, ISocketable item, string id = "", ApprovedBy approvedBy = ApprovedBy.None)
         {
-            SocketActionRequest request = new SocketActionRequest (action: Socket.Action.Equip, owner: owner, item: item, id: id, approvedBy: approvedBy);
+            SocketActionRequest request = new SocketActionRequest(action: Socket.Action.Equip, owner: owner, item: item, id: id, approvedBy: approvedBy);
 
-            return ResolveRequest (request);
+            return ResolveRequest(request);
         }
 
-        public static SocketActionRequest TryUnequipItemFromOwner (ISocketed owner, ISocketable item, string id = "", ApprovedBy approvedBy = ApprovedBy.None)
+        public static SocketActionRequest TryUnequipItemFromOwner(ISocketed owner, ISocketable item, string id = "", ApprovedBy approvedBy = ApprovedBy.None)
         {
-            SocketActionRequest request = new SocketActionRequest (action: Socket.Action.Unequip, owner: owner, item: item, id: id, approvedBy: approvedBy);
-            return ResolveRequest (request);
+            SocketActionRequest request = new SocketActionRequest(action: Socket.Action.Unequip, owner: owner, item: item, id: id, approvedBy: approvedBy);
+            return ResolveRequest(request);
         }
 
-        public static SocketActionRequest TryEmptySocket (Socket socket, ApprovedBy approvedBy = ApprovedBy.None)
+        public static SocketActionRequest TryEmptySocket(Socket socket, ApprovedBy approvedBy = ApprovedBy.None)
         {
-            SocketActionRequest request = new SocketActionRequest (action: Socket.Action.Empty, owner: socket.owner, item: null, id: socket.id, approvedBy: approvedBy);
-            return ResolveRequest (request);
+            SocketActionRequest request = new SocketActionRequest(action: Socket.Action.Empty, owner: socket.owner, item: null, id: socket.id, approvedBy: approvedBy);
+            return ResolveRequest(request);
         }
 
         /// <summary>
@@ -370,14 +344,14 @@
         /// </summary>
         /// <returns>Resolved request.</returns>
         /// <param name="request">Request.</param>
-        public static SocketActionRequest GetApproval (SocketActionRequest request)
+        public static SocketActionRequest GetApproval(SocketActionRequest request)
         {
             if (!request.isAprovedByAll)
             {
-                if (!request.approvedBy.Has (ApprovedBy.SocketOwner))
-                    request = request.owner.ResolveRequest (request);
-                if (!request.approvedBy.Has (ApprovedBy.Item))
-                    request = request.item.ResolveRequest (request);
+                if (!request.approvedBy.Has(ApprovedBy.SocketOwner))
+                    request = request.owner.ResolveRequest(request);
+                if (!request.approvedBy.Has(ApprovedBy.Item))
+                    request = request.item.ResolveRequest(request);
             }
 
             return request;
@@ -388,7 +362,7 @@
         /// </summary>
         /// <returns>The request.</returns>
         /// <param name="request">Request.</param>
-        public static SocketActionRequest ResolveRequest (SocketActionRequest request)
+        public static SocketActionRequest ResolveRequest(SocketActionRequest request)
         {
             Socket socket = null;
             if (request.action == Socket.Action.None)
@@ -398,110 +372,104 @@
 
             if (request.action == Socket.Action.Empty)
             {
-                request.socket.Empty (request.approvedBy);
+                request.socket.Empty(request.approvedBy);
                 return request;
             }
 
 
             if (request.action == Socket.Action.Add || request.action == Socket.Action.Remove)
             {
-                if (!request.approvedBy.Has (SocketActionRequest.ApprovedBy.SocketOwner))
-                    request = request.owner.ResolveRequest (request);
+                if (!request.approvedBy.Has(SocketActionRequest.ApprovedBy.SocketOwner))
+                    request = request.owner.ResolveRequest(request);
 
-                if (request.approvedBy.Has (SocketActionRequest.ApprovedBy.SocketOwner))
+                if (request.approvedBy.Has(SocketActionRequest.ApprovedBy.SocketOwner))
                 {
                     if (request.action == Socket.Action.Add)
-                        request.owner.AddSocket (request.socket);
+                        request.owner.AddSocket(request.socket);
                     else
-                        request.owner.RemoveSocket (request.socket);
+                        request.owner.RemoveSocket(request.socket);
                 }
 
                 return request;
             }
 
-            request = SocketActionRequest.GetApproval (request);
+            request = SocketActionRequest.GetApproval(request);
 
             if (request.isAprovedByAll)
             {
                 if (request.action == Socket.Action.Equip)
                 {
                     socket = request.socket;
-                    socket.AddItem (request, false);
+                    socket.AddItem(request, false);
                     return request;
                 }
 
                 if (request.action == Socket.Action.Unequip)
                 {
-                    socket = request.item.socket;
-                    socket.RemoveItem (request);
+                    socket = request.item.Socket;
+                    socket.RemoveItem(request);
                     return request;
                 }
             }
 
-            Debug.LogWarning (TAG + request.ToString () + "was rejected!");
+            Debug.LogWarning(TAG + request.ToString() + "was rejected!");
 
             return request;
         }
 
-        public static ApprovedBy ApprovedByAll
-        {
-            get
-            {
-                return ApprovedBy.SocketOwner | ApprovedBy.Item;
-            }
-        }
+        public static ApprovedBy ApprovedByAll { get { return ApprovedBy.SocketOwner | ApprovedBy.Item; } }
 
         #endregion
     }
 
     public interface ISocketed : ITransformable, IInitializable, ISocketActionRequestResolver // Character
     {
-        bool hasAnyItem { get; }
+        bool HasAnyItem { get; }
 
-        bool AddSocket (Socket socket);
+        bool AddSocket(Socket socket);
 
-        bool RemoveSocket (Socket socket);
+        bool RemoveSocket(Socket socket);
 
-        Socket GetSocket (string id);
+        Socket GetSocket(string id);
 
-        List<string> GetIds ();
+        List<string> GetIds();
 
-        List<ISocketable> GetItems ();
+        List<ISocketable> GetItems();
 
-        bool UnequipAll (SocketActionRequest.ApprovedBy approvedBy = SocketActionRequest.ApprovedBy.None);
+        bool UnequipAll(SocketActionRequest.ApprovedBy approvedBy = SocketActionRequest.ApprovedBy.None);
 
-        bool TryGetItemsOfType<T> (out List<T> list);
+        bool TryGetItemsOfType<T>(out List<T> list);
 
-        void OnItemEquipped (SocketActionRequest request);
+        void OnItemEquipped(SocketActionRequest request);
 
-        void OnItemUnequipped (SocketActionRequest request);
+        void OnItemUnequipped(SocketActionRequest request);
     }
 
     public interface ISocketable : ITransformable, IInitializable, ISocketActionRequestResolver// Item
     {
-        Socket socket
+        Socket Socket
         {
             get;
             set;
         }
 
-        bool isEquipped
+        bool IsEquipped
         {
             get;
         }
 
-        void Equip (SocketActionRequest request, bool inPlace = false);
+        void Equip(SocketActionRequest request, bool inPlace = false);
 
-        void Unequip (SocketActionRequest request);
+        void Unequip(SocketActionRequest request);
 
     }
 
     public interface ISocketActionRequestResolver
     {
-        SocketActionRequest ResolveRequest (SocketActionRequest request);
+        SocketActionRequest ResolveRequest(SocketActionRequest request);
     }
 
-    public delegate void SocketActionRequestDelegate (SocketActionRequest request);
-    public delegate void SocketableDelegate (ISocketable socketable);
-    public delegate void SocketedDelegate (ISocketed socketed);
+    public delegate void SocketActionRequestDelegate(SocketActionRequest request);
+    public delegate void SocketableDelegate(ISocketable socketable);
+    public delegate void SocketedDelegate(ISocketed socketed);
 }

@@ -13,7 +13,7 @@
 
         protected Transform _selfTransform;
 
-        public Transform selfTransform
+        public Transform SelfTransform
         {
             get
             {
@@ -27,7 +27,7 @@
 
         protected Collider2D _selfCollider2D;
 
-        public Collider2D selfCollider2D
+        public Collider2D SelfCollider2D
         {
             get
             {
@@ -37,7 +37,7 @@
 
         protected Rigidbody2D _selfRigidbody2D;
 
-        public Rigidbody2D selfRigidbody2D
+        public Rigidbody2D SelfRigidbody2D
         {
             get
             {
@@ -60,18 +60,18 @@
 
         public bool Initialize()
         {
-            if (!this.isInitialized)
+            if (!this.IsInitialized)
             {
                 this._selfTransform = this.transform;
                 this._selfCollider2D = GetComponent<Collider2D>();
                 this._selfRigidbody2D = GetComponent<Rigidbody2D>();
-                this.isInitialized = true;
+                this.IsInitialized = true;
                 return true;
             }
             return false;
         }
 
-        public bool isInitialized
+        public bool IsInitialized
         {
             get;
             protected set;
