@@ -241,6 +241,23 @@ namespace Extensions
             }
             return false;
         }
+
+        public static T Random<T>(this System.Enum type)
+        {
+            if (Mathf.IsPowerOfTwo((int)(object)type))
+            {
+                return (T)(object)type;
+            }
+
+            int value = 0;
+            do
+            {
+                value = 1 << UnityEngine.Random.Range(0, 32);
+            }
+            while ((((int)(object)type & value) != value));
+
+            return (T)(object)(value);
+        }
     }
     public static class EventTriggerExtensions
     {
@@ -506,5 +523,13 @@ namespace Extensions
         //}
         #endregion
 
+    }
+
+    public static class RandomExtensions
+    {
+        //public static int Flags32(this UnityEngine.Random random)
+        //{
+        //    return Random.Range(1, 32);
+        //}
     }
 }
