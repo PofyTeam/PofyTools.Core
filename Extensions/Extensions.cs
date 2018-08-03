@@ -11,8 +11,12 @@ namespace Extensions
 {
     public static class ArrayExtensions
     {
-
         public static T GetRandom<T>(this T[] array)
+        {
+            return array[Random.Range(0, array.Length)];
+        }
+
+        public static T TryGetRandom<T>(this T[] array)
         {
             T result = default(T);
 
@@ -25,7 +29,7 @@ namespace Extensions
         {
             int newIndex = lastRandomIndex;
             int length = array.Length;
-            Debug.Log("newIndex is " + newIndex);
+            //Debug.Log("newIndex is " + newIndex);
 
             if (length > 1)
             {
@@ -44,6 +48,58 @@ namespace Extensions
 
             return array[newIndex];
         }
+
+        public static T LastMember<T>(this T[] array)
+        {
+            return array[array.Length - 1];
+        }
+
+    }
+    public static class ListExtensions
+    {
+        public static T GetRandom<T>(this List<T> list)
+        {
+            return list[Random.Range(0, list.Count)];
+        }
+
+        /// <summary>
+        /// Gets the random element from the list or element's type default value.
+        /// </summary>
+        /// <returns>The random element or element's type default value.</returns>
+        public static T TryGetRandom<T>(this List<T> list)
+        {
+            int count = list.Count;
+            T result = default(T);
+
+            if (count != 0)
+                result = list[Random.Range(0, count)];
+            return result;
+        }
+
+        public static T GetNextRandom<T>(this List<T> list, ref int lastRandomIndex)
+        {
+            int newIndex = lastRandomIndex;
+            int length = list.Count;
+
+            if (length > 1)
+            {
+                do
+                {
+                    newIndex = Random.Range(0, length);
+                }
+                while (lastRandomIndex == newIndex);
+            }
+
+            lastRandomIndex = newIndex;
+
+            return list[newIndex];
+        }
+
+        public static T LastMember<T>(this List<T> list)
+        {
+            return list[list.Count - 1];
+        }
+
     }
     public static class AnimatorExtenstion
     {
@@ -141,24 +197,6 @@ namespace Extensions
                 }
             }
             return false;
-        }
-    }
-    public static class ListExtension
-    {
-
-        public static T GetRandomMember<T>(this List<T> list)
-        {
-            return list[Random.Range(0, list.Count)];
-        }
-
-        public static T LastMember<T>(this List<T> list)
-        {
-            return list[list.Count - 1];
-        }
-
-        public static T LastMember<T>(this T[] array)
-        {
-            return array[array.Length - 1];
         }
     }
     public static class ComponentExtension
@@ -270,41 +308,6 @@ namespace Extensions
             entry.callback = new UnityEngine.EventSystems.EventTrigger.TriggerEvent();
             entry.callback.AddListener(new UnityAction<BaseEventData>(callback));
             trigger.triggers.Add(entry);
-        }
-    }
-    public static class ListExtensions
-    {
-        /// <summary>
-        /// Gets the random element from the list or element's type default value.
-        /// </summary>
-        /// <returns>The random element or element's type default value.</returns>
-        public static T GetRandom<T>(this List<T> list)
-        {
-            int count = list.Count;
-            T result = default(T);
-
-            if (count != 0)
-                result = list[Random.Range(0, count)];
-            return result;
-        }
-
-        public static T GetNextRandom<T>(this List<T> list, ref int lastRandomIndex)
-        {
-            int newIndex = lastRandomIndex;
-            int length = list.Count;
-
-            if (length > 1)
-            {
-                do
-                {
-                    newIndex = Random.Range(0, length);
-                }
-                while (lastRandomIndex == newIndex);
-            }
-
-            lastRandomIndex = newIndex;
-
-            return list[newIndex];
         }
     }
     public static class StringExtensions
@@ -523,13 +526,5 @@ namespace Extensions
         //}
         #endregion
 
-    }
-
-    public static class RandomExtensions
-    {
-        //public static int Flags32(this UnityEngine.Random random)
-        //{
-        //    return Random.Range(1, 32);
-        //}
     }
 }
