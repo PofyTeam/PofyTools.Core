@@ -140,7 +140,7 @@ namespace PofyTools
                     state = this._stateStack[i];
                     if (!state.IsPermanent || endPermanent)
                     {
-                        if (state.Priority > priority)
+                        if (state.Priority >= priority)
                         {
                             this._stateStack.RemoveAt(i);
                             state.ExitState();
