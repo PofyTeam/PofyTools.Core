@@ -100,6 +100,13 @@ namespace Extensions
             return list[list.Count - 1];
         }
 
+        public static bool AddOnce<T>(this List<T> list, T element)
+        {
+            if (list.Contains(element))
+                return false;
+            list.Add(element);
+            return true;
+        }
     }
     public static class AnimatorExtenstion
     {

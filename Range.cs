@@ -322,6 +322,33 @@
             return range.Current;
         }
 
+        //public static implicit operator Range(float value)
+        //{
+        //    return new Range(0, value, value);
+        //}
+
+        public static float operator +(Range left, float right)
+        {
+            left.Current += right;
+            return left.Current;
+        }
+
+        public static float operator +(float left, Range right)
+        {
+            left += right.Current;
+            return left;
+        }
+        public static float operator -(Range left, float right)
+        {
+            left.Current -= right;
+            return left.Current;
+        }
+        public static float operator -(float left, Range right)
+        {
+            left -= right.Current;
+            return left;
+        }
+
     }
 
     /// <summary>
