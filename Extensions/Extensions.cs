@@ -29,7 +29,6 @@ namespace Extensions
         {
             int newIndex = lastRandomIndex;
             int length = array.Length;
-            //Debug.Log("newIndex is " + newIndex);
 
             if (length > 1)
             {
