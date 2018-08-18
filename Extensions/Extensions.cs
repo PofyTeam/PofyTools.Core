@@ -323,26 +323,28 @@ namespace Extensions
             return CultureInfo.CurrentCulture.TextInfo.ToTitleCase(value.ToLower());
         }
 
-        public static string SplitCamelCase(this string str)
+    }
+    public static class FloatExtensions
+    {
+        public static string KiloFormat(this float value)
         {
-            return Regex.Replace(
-                Regex.Replace(
-                    str,
-                    @"(\P{Ll})(\P{Ll}\p{Ll})",
-                    "$1 $2"
-                ),
-                @"(\p{Ll})(\P{Ll})",
-                "$1 $2"
-            );
+            if (value > 100000f)
+                return (value / 1000000f).ToString("#.#M");
+            if (value > 1000)
+                return (value / 1000).ToString("#.#K");
+            return value.ToString("0");
         }
-
-        //public static string ToTitle(this string str)
-        //{
-        //    int minLength = 2;
-        //    string regexPattern = string.Format(@"^\w|\b\w(?=\w{{{0}}})", minLength);
-        //    return Regex.Replace(str, regexPattern, m => m.Value.ToUpperInvariant());
-
-        //}
+    }
+    public static class IntExtensions
+    {
+        public static string KiloFormat(this int value)
+        {
+            if (value > 1000000f)
+                return ((float)(value / 1000000f)).ToString("#.#M");
+            if (value > 1000)
+                return ((float)(value / 1000f)).ToString("#.#K");
+            return value.ToString();
+        }
     }
     public static class TransformExtensions
     {
