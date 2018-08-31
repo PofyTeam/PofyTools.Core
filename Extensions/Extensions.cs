@@ -61,6 +61,14 @@ namespace Extensions
             return list[Random.Range(0, list.Count)];
         }
 
+        public static T PopRandom<T>(this List<T> list)
+        {
+            var index = Random.Range(0, list.Count);
+            var result = list[index];
+            list.RemoveAt(index);
+            return result;
+        }
+
         /// <summary>
         /// Gets the random element from the list or element's type default value.
         /// </summary>
